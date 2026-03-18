@@ -10,5 +10,6 @@ router.post('/column/:columnId', taskController.createTask);
 router.patch('/:id', taskController.updateTask);
 router.delete('/:id', taskController.deleteTask);
 router.post('/:id/assign', taskController.assignTask);
+router.delete('/:id/assign', taskController.unassignTask);
 
 module.exports = router;

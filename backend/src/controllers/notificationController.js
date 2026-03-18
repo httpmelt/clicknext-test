@@ -3,8 +3,8 @@ const pool = require('../config/db');
 exports.getNotifications = async (req, res) => {
     try {
         const notifications = await pool.query(
-            'SELECT "notificationId", "userId", message, "isRead", "createdAt" FROM "Notifications" WHERE "userId" = $1 ORDER BY "createdAt" DESC',
-            [req.user.userId]
+            'SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC',
+            [req.user.user_id]
         );
         res.json(notifications.rows);
     } catch (err) {
@@ -17,8 +17,8 @@ exports.markAsRead = async (req, res) => {
     const { id } = req.params;
     try {
         await pool.query(
-            'UPDATE "Notifications" SET "isRead" = TRUE WHERE "notificationId" = $1 AND "userId" = $2',
-            [id, req.user.userId]
+            'UPDATE notifications SET is_read = TRUE WHERE notification_id = $1 AND user_id = $2',
+            [id, req.user.user_id]
         );
         res.json({ message: 'Notification marked as read' });
     } catch (err) {

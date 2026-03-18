@@ -7,6 +7,7 @@ router.use(authMiddleware);
 
 router.get('/', boardController.getBoards);
 router.post('/', boardController.createBoard);
+router.get('/:id/members', boardController.getBoardMembers);
 router.patch('/:id', boardController.updateBoard);
 router.delete('/:id', boardController.deleteBoard);
 router.post('/:id/invite', boardController.inviteMember);
