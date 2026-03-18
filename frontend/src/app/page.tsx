@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { boardApi } from '@/lib/api';
 import { Board } from '@/types';
 import Navbar from '@/components/Navbar';
-import { Plus, Layout, Trash2, Calendar, Users, ChevronRight, Edit2 } from 'lucide-react';
+import { Plus, Layout, Trash2, Calendar, Users, Edit2, X } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Dashboard() {
@@ -39,7 +39,7 @@ export default function Dashboard() {
         }
     };
 
-    const filteredBoards = boards.filter(board => 
+    const filteredBoards = boards.filter(board =>
         board.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -91,195 +91,208 @@ export default function Dashboard() {
     };
 
     if (loading) return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent" />
         </div>
     );
 
     return (
-        <div className="min-h-screen bg-[#f8fafc]">
+        <div className="min-h-screen bg-gray-50">
             <Navbar onSearch={setSearchTerm} />
-            <main className="max-w-7xl mx-auto px-8 py-12">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
+
+            <main className="max-w-7xl mx-auto px-6 py-10">
+                {/* Page Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
-                        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Project Dashboard</h1>
-                        {searchTerm ? (
-                            <p className="text-slate-500 mt-1 font-medium">Searching for "{searchTerm}"</p>
-                        ) : (
-                            <p className="text-slate-500 mt-1 font-medium">Manage your projects and team collaboration</p>
-                        )}
+                        <h1 className="text-2xl font-bold text-gray-900">Boards</h1>
+                        <p className="text-sm text-gray-500 mt-0.5">
+                            {searchTerm
+                                ? `Showing results for "${searchTerm}"`
+                                : 'Manage your projects and collaborate with your team'}
+                        </p>
                     </div>
-                    <button 
+                    <button
                         onClick={() => setShowCreateModal(true)}
-                        className="group flex items-center space-x-2 bg-indigo-600 text-white px-6 py-3 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
+                        className="flex items-center gap-2 bg-indigo-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors"
                     >
-                        <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-                        <span className="font-bold">Create New Board</span>
+                        <Plus size={16} />
+                        <span>Create New Board</span>
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {/* Boards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {filteredBoards.map((board) => (
-                        <Link 
-                            key={board.board_id} 
+                        <Link
+                            key={board.board_id}
                             href={`/boards/${board.board_id}`}
-                            className="group bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-indigo-50/50 hover:border-indigo-100 transition-all duration-300 relative overflow-hidden"
+                            className="group bg-white rounded-xl border border-gray-200 p-5 hover:border-indigo-200 hover:shadow-md transition-all duration-150 relative"
                         >
-                            <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
-                                <button 
+                            {/* Action buttons (visible on hover) */}
+                            <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
                                     onClick={(e) => openEditModal(board, e)}
-                                    className="p-2 bg-slate-50 text-slate-500 rounded-xl hover:bg-slate-100 transition-colors"
+                                    className="p-1.5 bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
                                 >
-                                    <Edit2 size={16} />
+                                    <Edit2 size={13} />
                                 </button>
-                                <button 
+                                <button
                                     onClick={(e) => handleDeleteBoard(board.board_id, e)}
-                                    className="p-2 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-100 transition-colors"
+                                    className="p-1.5 bg-gray-50 hover:bg-rose-50 text-gray-400 hover:text-rose-500 rounded-lg transition-colors"
                                 >
-                                    <Trash2 size={16} />
+                                    <Trash2 size={13} />
                                 </button>
                             </div>
 
-                            <div className="mb-6">
-                                <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl w-fit group-hover:scale-110 transition-transform duration-300">
-                                    <Layout size={24} />
-                                </div>
+                            {/* Board Icon */}
+                            <div className="w-9 h-9 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center mb-4">
+                                <Layout size={18} />
                             </div>
-                            
-                            <h3 className="text-lg font-bold text-slate-800 mb-2 truncate pr-16">{board.name}</h3>
-                            
-                            <div className="flex flex-col space-y-4 mt-6">
-                                <div className="flex items-center text-slate-400 text-xs font-semibold uppercase tracking-wider">
-                                    <Calendar size={14} className="mr-2" />
-                                    <span>Added {new Date(board.created_at).toLocaleDateString()}</span>
+
+                            {/* Board Name */}
+                            <h3 className="text-sm font-semibold text-gray-900 mb-3 pr-12 truncate">
+                                {board.name}
+                            </h3>
+
+                            {/* Meta */}
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                                    <Calendar size={12} />
+                                    <span>{new Date(board.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center text-slate-400 text-xs font-semibold uppercase tracking-wider">
-                                        <Users size={14} className="mr-2" />
-                                        <span>{board.member_count ?? 0} {Number(board.member_count) === 1 ? 'Member' : 'Members'}</span>
+                                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                                        <Users size={12} />
+                                        <span>{board.member_count ?? 0} {Number(board.member_count) === 1 ? 'member' : 'members'}</span>
                                     </div>
-                                    <div className="flex -space-x-2">
-                                        {board.members?.slice(0, 3).map((member) => (
-                                            <div 
-                                                key={member.user_id}
-                                                className="w-6 h-6 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-600"
-                                                title={member.username}
-                                            >
-                                                {member.username[0].toUpperCase()}
-                                            </div>
-                                        ))}
-                                        {(Number(board.member_count) > 3) && (
-                                            <div className="w-6 h-6 rounded-full border-2 border-white bg-indigo-50 flex items-center justify-center text-[8px] font-bold text-indigo-600">
-                                                +{Number(board.member_count) - 3}
-                                            </div>
-                                        )}
-                                    </div>
+                                    {board.members && board.members.length > 0 && (
+                                        <div className="flex -space-x-1.5">
+                                            {board.members.slice(0, 3).map((member) => (
+                                                <div
+                                                    key={member.user_id}
+                                                    className="w-5 h-5 rounded-full border-2 border-white bg-indigo-400 flex items-center justify-center text-[7px] font-bold text-white"
+                                                    title={member.username}
+                                                >
+                                                    {member.username[0].toUpperCase()}
+                                                </div>
+                                            ))}
+                                            {Number(board.member_count) > 3 && (
+                                                <div className="w-5 h-5 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-[7px] font-bold text-gray-500">
+                                                    +{Number(board.member_count) - 3}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-
-                            <div className="mt-8 flex items-center text-indigo-600 font-bold text-sm">
-                                <span>Open Board</span>
-                                <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
                             </div>
                         </Link>
                     ))}
 
-                    <button 
+                    {/* Add New Board Card */}
+                    <button
                         onClick={() => setShowCreateModal(true)}
-                        className="flex flex-col items-center justify-center p-8 rounded-3xl border-2 border-dashed border-slate-200 text-slate-400 hover:border-indigo-300 hover:bg-indigo-50/30 hover:text-indigo-500 transition-all duration-300 group min-h-[220px]"
+                        className="flex flex-col items-center justify-center min-h-[168px] rounded-xl border-2 border-dashed border-gray-200 text-gray-400 hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50/30 transition-all duration-150 group"
                     >
-                        <div className="bg-slate-100 p-4 rounded-full mb-4 group-hover:bg-indigo-100 transition-colors">
-                            <Plus size={32} />
+                        <div className="w-9 h-9 rounded-lg border-2 border-dashed border-current flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <Plus size={18} />
                         </div>
-                        <span className="font-bold">Add New Board</span>
+                        <span className="text-sm font-medium">New Board</span>
                     </button>
                 </div>
             </main>
 
-            {/* Create Modal */}
+            {/* Create Board Modal */}
             {showCreateModal && (
-                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl animate-in zoom-in-95 duration-200">
-                        <div className="mb-8">
-                            <h2 className="text-2xl font-black text-slate-900">New Board</h2>
-                            <p className="text-slate-500 font-medium">What should we name your next workspace?</p>
+                <Modal title="New Board" subtitle="Name your new workspace" onClose={() => setShowCreateModal(false)}>
+                    <form onSubmit={handleCreateBoard} className="space-y-4">
+                        <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Board name</label>
+                            <input
+                                type="text"
+                                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all"
+                                placeholder="e.g. Marketing Project"
+                                value={newBoardName}
+                                onChange={(e) => setNewBoardName(e.target.value)}
+                                autoFocus
+                                required
+                            />
                         </div>
-                        <form onSubmit={handleCreateBoard}>
-                            <div className="relative mb-8">
-                                <Layout className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                <input
-                                    type="text"
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all font-semibold text-slate-700"
-                                    placeholder="e.g. Marketing Project"
-                                    value={newBoardName}
-                                    onChange={(e) => setNewBoardName(e.target.value)}
-                                    autoFocus
-                                    required
-                                />
-                            </div>
-                            <div className="flex space-x-4">
-                                <button 
-                                    type="button"
-                                    onClick={() => setShowCreateModal(false)}
-                                    className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button 
-                                    type="submit"
-                                    className="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
-                                >
-                                    Create Board
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                        <div className="flex gap-3 pt-1">
+                            <button
+                                type="button"
+                                onClick={() => setShowCreateModal(false)}
+                                className="flex-1 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="flex-1 py-2.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                            >
+                                Create Board
+                            </button>
+                        </div>
+                    </form>
+                </Modal>
             )}
 
-            {/* Edit Modal */}
+            {/* Edit Board Modal */}
             {showEditModal && (
-                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl animate-in zoom-in-95 duration-200">
-                        <div className="mb-8">
-                            <h2 className="text-2xl font-black text-slate-900">Rename Board</h2>
-                            <p className="text-slate-500 font-medium">Change the name of your workspace</p>
+                <Modal title="Rename Board" subtitle="Update the name of your workspace" onClose={() => { setShowEditModal(false); setEditingBoard(null); }}>
+                    <form onSubmit={handleEditBoard} className="space-y-4">
+                        <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Board name</label>
+                            <input
+                                type="text"
+                                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all"
+                                value={editBoardName}
+                                onChange={(e) => setEditBoardName(e.target.value)}
+                                autoFocus
+                                required
+                            />
                         </div>
-                        <form onSubmit={handleEditBoard}>
-                            <div className="relative mb-8">
-                                <Layout className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                <input
-                                    type="text"
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all font-semibold text-slate-700"
-                                    placeholder="Board name"
-                                    value={editBoardName}
-                                    onChange={(e) => setEditBoardName(e.target.value)}
-                                    autoFocus
-                                    required
-                                />
-                            </div>
-                            <div className="flex space-x-4">
-                                <button 
-                                    type="button"
-                                    onClick={() => {
-                                        setShowEditModal(false);
-                                        setEditingBoard(null);
-                                    }}
-                                    className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button 
-                                    type="submit"
-                                    className="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
-                                >
-                                    Rename Board
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                        <div className="flex gap-3 pt-1">
+                            <button
+                                type="button"
+                                onClick={() => { setShowEditModal(false); setEditingBoard(null); }}
+                                className="flex-1 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="flex-1 py-2.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </Modal>
             )}
+        </div>
+    );
+}
+
+function Modal({ title, subtitle, onClose, children }: {
+    title: string;
+    subtitle: string;
+    onClose: () => void;
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
+                <div className="flex justify-between items-start mb-5">
+                    <div>
+                        <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+                        <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>
+                    </div>
+                    <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors">
+                        <X size={16} />
+                    </button>
+                </div>
+                {children}
+            </div>
         </div>
     );
 }
