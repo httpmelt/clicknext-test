@@ -3,7 +3,12 @@ const pool = require('../config/db');
 exports.getBoards = async (req, res) => {
     try {
         const boards = await pool.query(
-            `SELECT b.board_id, b.name, b.owner_id, b.created_at 
+            `SELECT b.board_id, b.name, b.owner_id, b.created_at,
+             (SELECT COUNT(*) FROM board_members bm2 WHERE bm2.board_id = b.board_id) as member_count,
+             (SELECT json_agg(json_build_object('user_id', u.user_id, 'username', u.username))
+              FROM users u
+              JOIN board_members bm3 ON u.user_id = bm3.user_id
+              WHERE bm3.board_id = b.board_id) as members
              FROM boards b
              JOIN board_members bm ON b.board_id = bm.board_id
              WHERE bm.user_id = $1`,
@@ -130,10 +135,14 @@ exports.inviteMember = async (req, res) => {
             [id, invited_user_id]
         );
 
+        // Get board name for notification
+        const board = await pool.query('SELECT name FROM boards WHERE board_id = $1', [id]);
+        const boardName = board.rows[0]?.name || id;
+
         // Notify user
         await pool.query(
-            'INSERT INTO notifications (user_id, message) VALUES ($1, $2)',
-            [invited_user_id, `You have been invited to board ${id}`]
+            'INSERT INTO notifications (user_id, message, link) VALUES ($1, $2, $3)',
+            [invited_user_id, `You have been invited to board "${boardName}"`, `/boards/${id}`]
         );
 
         res.json({ message: 'Member invited successfully' });

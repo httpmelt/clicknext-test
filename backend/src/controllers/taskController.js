@@ -95,11 +95,20 @@ exports.assignTask = async (req, res) => {
             [id, user_id]
         );
 
-        // Notify user
-        const task = await pool.query('SELECT title FROM tasks WHERE task_id = $1', [id]);
+        // Notify user with board info
+        const taskInfo = await pool.query(
+            `SELECT t.title, b.name as board_name, b.board_id 
+             FROM tasks t
+             JOIN columns c ON t.column_id = c.column_id
+             JOIN boards b ON c.board_id = b.board_id
+             WHERE t.task_id = $1`,
+            [id]
+        );
+        
+        const { title, board_name, board_id } = taskInfo.rows[0];
         await pool.query(
-            'INSERT INTO notifications (user_id, message) VALUES ($1, $2)',
-            [user_id, `You have been assigned to task: ${task.rows[0].title}`]
+            'INSERT INTO notifications (user_id, message, link) VALUES ($1, $2, $3)',
+            [user_id, `You have been assigned to task: "${title}" in board "${board_name}"`, `/boards/${board_id}`]
         );
 
         res.json({ message: 'User assigned to task' });
