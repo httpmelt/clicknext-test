@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authApi } from '@/lib/api';
 import Link from 'next/link';
-import { Layers, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
+import { Layers, Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
     const [email, setEmail]       = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError]       = useState('');
     const [loading, setLoading]   = useState(false);
     const router = useRouter();
@@ -142,8 +143,8 @@ export default function LoginPage() {
                                     style={{ color: 'var(--text-muted)' }}
                                 />
                                 <input
-                                    type="password"
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none transition-all"
+                                    type={showPassword ? "text" : "password"}
+                                    className="w-full pl-10 pr-10 py-3 rounded-xl text-sm outline-none transition-all"
                                     style={{
                                         background: 'var(--bg-overlay)',
                                         border: '1px solid var(--border-subtle)',
@@ -157,6 +158,14 @@ export default function LoginPage() {
                                     onBlur={e => (e.currentTarget.style.borderColor = 'var(--border-subtle)')}
                                     required
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 p-0.5 rounded-md hover:bg-white/5 transition-colors"
+                                    style={{ color: 'var(--text-muted)' }}
+                                >
+                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
                             </div>
                         </div>
 
