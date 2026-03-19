@@ -94,3 +94,11 @@ The task_assignments table defines a many-to-many relationship between tasks and
 - Notifications
 
 The notifications table stores messages sent to users. Each notification belongs to a single user and contains a message, an optional link, and a read status. This allows the system to inform users about updates or actions related to boards and tasks.
+
+## Relationships Summary
+   - A user can own multiple boards (one-to-many).
+   - Users and boards have a many-to-many relationship through board_members.
+   - A board can have multiple columns (one-to-many).
+   - A column can have multiple tasks (one-to-many).
+   - Tasks and users have a many-to-many relationship through task_assignments.
+   - A user can receive multiple notifications (one-to-many).
